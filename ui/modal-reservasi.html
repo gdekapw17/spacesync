@@ -1,0 +1,781 @@
+<!doctype html>
+
+<html class="light" lang="id" style="">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Booking Modal - SpaceSync</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-container": "#dce2f3",
+              "on-tertiary-fixed": "#1f1a1a",
+              "on-background": "#1c1b1b",
+              "on-secondary": "#ffffff",
+              "error-container": "#ffdad6",
+              secondary: "#585f6c",
+              "on-tertiary-fixed-variant": "#4c4545",
+              "on-surface": "#1c1b1b",
+              "on-primary-fixed": "#1c1b1d",
+              "surface-container-low": "#f7f3f2",
+              "tertiary-fixed": "#ebe0df",
+              "tertiary-container": "#1f1a1a",
+              tertiary: "#000000",
+              "outline-variant": "#c8c5ca",
+              "on-secondary-fixed-variant": "#404754",
+              "on-primary-container": "#858386",
+              "surface-dim": "#ddd9d9",
+              "secondary-fixed": "#dce2f3",
+              "inverse-primary": "#c8c6c8",
+              "inverse-on-surface": "#f4f0ef",
+              surface: "#fdf8f8",
+              error: "#ba1a1a",
+              "surface-container-high": "#ebe7e7",
+              "primary-fixed-dim": "#c8c6c8",
+              primary: "#000000",
+              background: "#fdf8f8",
+              "primary-fixed": "#e5e1e4",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#474649",
+              "tertiary-fixed-dim": "#cec4c4",
+              "on-surface-variant": "#47464a",
+              "surface-bright": "#fdf8f8",
+              "surface-container-highest": "#e5e2e1",
+              "primary-container": "#1c1b1d",
+              "inverse-surface": "#313030",
+              "on-tertiary-container": "#8a8282",
+              "surface-variant": "#e5e2e1",
+              "secondary-fixed-dim": "#c0c7d6",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#f1edec",
+              "on-secondary-container": "#5e6572",
+              "on-primary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-secondary-fixed": "#151c27",
+              "surface-tint": "#5f5e60",
+              outline: "#78767b",
+              "zinc-950": "#09090b",
+              "gray-200": "#e5e7eb",
+              "gray-300": "#d1d5db",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            spacing: {
+              xl: "32px",
+              gutter: "16px",
+              xs: "4px",
+              unit: "4px",
+              lg: "24px",
+              margin: "24px",
+              sm: "8px",
+              md: "16px",
+            },
+            fontFamily: {
+              "headline-sm": ["Geist"],
+              "mono-label": ["JetBrains Mono"],
+              "body-base": ["Geist"],
+              "headline-md": ["Geist"],
+              "headline-lg": ["Geist"],
+              "body-sm": ["Geist"],
+              "mono-data": ["JetBrains Mono"],
+            },
+            fontSize: {
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "24px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "mono-label": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.02em",
+                  fontWeight: "500",
+                },
+              ],
+              "body-base": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.015em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-lg": [
+                "30px",
+                {
+                  lineHeight: "36px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+              "mono-data": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Geist", sans-serif;
+        background-color: #fafafa;
+      }
+      /* Simulated Calendar Background */
+      .calendar-bg {
+        background-image:
+          linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+          linear-gradient(to bottom, #e5e7eb 1px, transparent 1px);
+        background-size: 100px 100px;
+      }
+    </style>
+  </head>
+  <body
+    class="h-screen w-full relative overflow-hidden text-on-surface bg-surface-container-low"
+  >
+    <!-- Top Navigation Bar -->
+    <header
+      class="border-b border-outline-variant sticky top-0 w-full h-[56px] z-50 bg-white right-0"
+    >
+      <div
+        class="flex justify-between items-center px-lg max-w-[1200px] mx-auto h-full"
+      >
+        <!-- Left: Brand -->
+        <div class="flex items-center flex-1">
+          <span
+            class="font-headline-md text-headline-md text-primary tracking-tight"
+            >SpaceSync</span
+          >
+        </div>
+        <!-- Center: Navigation -->
+        <nav
+          class="hidden md:flex items-center justify-center gap-md h-full flex-1"
+        >
+          <a
+            class="h-full flex items-center text-secondary hover:text-primary transition-colors duration-150 text-body-base"
+            href="#"
+            >Jelajahi Fasilitas</a
+          >
+          <a
+            class="h-full flex items-center text-primary border-b-2 border-primary pt-0.5 text-body-base font-medium"
+            href="#"
+            >Reservasi Saya</a
+          >
+        </nav>
+        <!-- Right: Utilities -->
+        <div class="flex items-center justify-end gap-sm flex-1">
+          <button
+            aria-label="Notifications"
+            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-secondary"
+          >
+            <span class="material-symbols-outlined text-[20px]"
+              >notifications</span
+            >
+          </button>
+          <button
+            aria-label="Settings"
+            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-secondary"
+          >
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+          </button>
+          <div
+            class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden ml-2 flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-[20px] text-secondary"
+              >person</span
+            >
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-[1200px] mx-auto px-lg py-xl">
+      <header class="mb-lg relative">
+        <h1 class="font-headline-lg text-headline-lg text-primary">
+          Reservasi Saya
+        </h1>
+        <p class="text-secondary font-body-base text-body-base mt-sm">
+          Kelola riwayat pemesanan dan pantau ketersediaan jadwal fasilitas
+          secara menyeluruh.
+        </p>
+        <div
+          class="absolute top-0 right-0 flex bg-white border border-[#E5E7EB] rounded-md p-0.5"
+        >
+          <button
+            class="p-1 flex items-center justify-center text-secondary hover:text-primary"
+          >
+            <span class="material-symbols-outlined text-[20px]"
+              >format_list_bulleted</span
+            ></button
+          ><button
+            class="p-1 flex items-center justify-center bg-[#F3F4F6] rounded-sm text-primary"
+          >
+            <span class="material-symbols-outlined text-[20px]"
+              >calendar_today</span
+            >
+          </button>
+        </div>
+      </header>
+      <!-- Calendar Component -->
+      <div class="flex justify-between items-center mb-4">
+        <div
+          class="font-semibold text-lg text-[#111827] flex items-center gap-1 cursor-pointer"
+        >
+          Juli 2026
+          <span class="material-symbols-outlined text-[20px]">expand_more</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="relative flex items-center">
+            <select
+              class="appearance-none bg-white border border-[#E5E7EB] text-sm rounded-sm px-3 py-1.5 pr-8 font-medium text-secondary focus:outline-none cursor-pointer"
+            >
+              <option>Tampilkan: Semua Reservasi</option>
+              <option>Reservasi Saya</option></select
+            ><span
+              class="material-symbols-outlined absolute right-2 pointer-events-none text-[18px]"
+              >expand_more</span
+            >
+          </div>
+          <button
+            class="h-8 px-3 border border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#FAFAFA] hover:text-[#111827] transition-all duration-150 ease-in-out rounded-[4px] text-sm font-medium shadow-none"
+          >
+            Hari Ini
+          </button>
+          <div class="flex items-center">
+            <button
+              class="h-8 w-8 flex items-center justify-center border border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#FAFAFA] hover:text-[#111827] transition-all duration-150 ease-in-out rounded-l-[4px] shadow-none"
+            >
+              <span class="material-symbols-outlined text-[20px]"
+                >chevron_left</span
+              >
+            </button>
+            <button
+              class="h-8 w-8 flex items-center justify-center border-y border-r border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#FAFAFA] hover:text-[#111827] transition-all duration-150 ease-in-out rounded-r-[4px] shadow-none"
+            >
+              <span class="material-symbols-outlined text-[20px]"
+                >chevron_right</span
+              >
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="w-full bg-[#E5E7EB] border border-[#E5E7EB] grid grid-cols-7 gap-[1px]"
+      >
+        <!-- Header Row -->
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          SEN
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          SEL
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          RAB
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          KAM
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          JUM
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          SAB
+        </div>
+        <div
+          class="bg-[#FAFAFA] py-sm px-md text-xs font-semibold text-[#6B7280] uppercase tracking-wider text-center"
+        >
+          MIN
+        </div>
+        <!-- Week 1 (Starts Wed July 1) -->
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer opacity-50"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >29</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer opacity-50"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >30</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >1</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >2</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >3</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >4</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >5</span
+          >
+        </div>
+        <!-- Week 2 -->
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >6</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >7</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >8</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >9</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >10</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >11</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >12</span
+          >
+        </div>
+        <!-- Week 3 -->
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >13</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >14</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >15</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >16</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >17</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >18</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >19</span
+          >
+        </div>
+        <!-- Week 4 -->
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >20</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >21</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >22</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >23</span
+          >
+        </div>
+        <div
+          class="bg-[#F3F4F6] min-h-[120px] p-sm flex flex-col"
+          data-action="trigger-booking-modal"
+        >
+          <div class="flex justify-end items-center gap-1 mb-sm">
+            <div class="w-1.5 h-1.5 rounded-full bg-[#09090B]"></div>
+            <span
+              class="text-primary font-mono-data text-mono-data font-semibold"
+              >24</span
+            >
+          </div>
+          <div class="flex flex-col gap-[2px]">
+            <div
+              class="bg-emerald-50 border border-emerald-300 text-emerald-600 rounded-[2px] px-1 py-0.5 text-xs font-mono-label truncate cursor-pointer hover:ring-1 hover:ring-[#09090B] hover:ring-offset-1 transition-all"
+              data-action="trigger-detail-panel"
+              title="09:00 - Boardroom"
+            >
+              09:00 - Boardroom
+            </div>
+            <div
+              class="bg-amber-50 border border-amber-300 text-amber-600 rounded-[2px] px-1 py-0.5 text-xs font-mono-label truncate cursor-pointer hover:ring-1 hover:ring-[#09090B] hover:ring-offset-1 transition-all"
+              data-action="trigger-detail-panel"
+              title="14:00 - Studio"
+            >
+              14:00 - Studio
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >25</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >26</span
+          >
+        </div>
+        <!-- Week 5 -->
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >27</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >28</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >29</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >30</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >31</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer opacity-50"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >1</span
+          >
+        </div>
+        <div
+          class="bg-white min-h-[120px] p-sm hover:bg-[#FAFAFA] transition-none flex flex-col cursor-pointer opacity-50"
+          data-action="trigger-booking-modal"
+        >
+          <span class="text-secondary font-mono-data text-mono-data self-end"
+            >2</span
+          >
+        </div>
+      </div>
+    </main>
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 backdrop-blur-[4px]"
+    >
+      <!-- Modal Container (Level 2 Surface) -->
+      <div
+        aria-labelledby="modal-title"
+        aria-modal="true"
+        class="w-full max-w-lg bg-white p-6 rounded-sm border border-[#E5E7EB] shadow-none relative"
+        role="dialog"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-semibold text-[#111827]" id="modal-title">
+            Buat Reservasi Baru
+          </h2>
+          <button
+            aria-label="Close"
+            class="text-secondary hover:bg-surface-container p-1 rounded-sm transition-colors duration-150 flex items-center justify-center w-8 h-8 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2"
+            type="button"
+          >
+            <span
+              class="material-symbols-outlined text-[20px]"
+              data-icon="close"
+              >close</span
+            >
+          </button>
+        </div>
+        <!-- Form -->
+        <form class="space-y-md">
+          <!-- Facility Field -->
+          <div>
+            <label
+              class="block font-mono-label text-mono-label text-on-surface-variant mb-2"
+              for="fasilitas"
+              >Fasilitas</label
+            >
+            <div class="relative">
+              <select
+                class="w-full bg-white border border-[#E5E7EB] rounded-sm px-3 py-2 text-sm text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-[#09090B] focus:ring-offset-2 transition-all duration-150 shadow-none"
+                id="fasilitas"
+                name="fasilitas"
+              >
+                <option value="">Pilih ruangan atau fasilitas</option>
+                <option selected="" value="room-a">
+                  Meeting Room A (10 pax)
+                </option>
+                <option value="room-b">Boardroom B (20 pax)</option>
+                <option value="studio-1">Design Studio 1</option>
+              </select>
+              <div
+                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-secondary"
+              >
+                <span
+                  class="material-symbols-outlined text-[18px]"
+                  data-icon="expand_more"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Date & Time Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+            <div>
+              <label
+                class="block font-mono-label text-mono-label text-on-surface-variant mb-2"
+                for="tanggal"
+                >Tanggal</label
+              >
+              <input
+                class="w-full bg-white border border-[#E5E7EB] rounded-sm px-3 py-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-[#09090B] focus:ring-offset-2 transition-all duration-150 shadow-none"
+                id="tanggal"
+                name="tanggal"
+                type="date"
+              />
+            </div>
+            <div>
+              <label
+                class="block font-mono-label text-mono-label text-on-surface-variant mb-2"
+                for="waktu_mulai"
+                >Waktu Mulai</label
+              >
+              <input
+                class="w-full bg-white border border-[#E5E7EB] rounded-sm px-3 py-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-[#09090B] focus:ring-offset-2 transition-all duration-150 shadow-none"
+                id="waktu_mulai"
+                name="waktu_mulai"
+                type="time"
+              />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+            <div>
+              <label
+                class="block font-mono-label text-mono-label text-on-surface-variant mb-2"
+                for="durasi_jam"
+                >Durasi Reservasi (Jam)</label
+              >
+              <input
+                class="w-full bg-white border border-[#E5E7EB] rounded-sm px-3 py-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-[#09090B] focus:ring-offset-2 transition-all duration-150 font-mono-data shadow-none"
+                id="durasi_jam"
+                min="1"
+                name="durasi_jam"
+                placeholder="Contoh: 2"
+                type="number"
+                value="2"
+              />
+            </div>
+            <div></div>
+          </div>
+          <!-- Notes Field -->
+          <div>
+            <label
+              class="block font-mono-label text-mono-label text-on-surface-variant mb-2"
+              for="catatan"
+              >Catatan/Keperluan</label
+            >
+            <textarea
+              class="w-full bg-white border border-[#E5E7EB] rounded-sm px-3 py-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-[#09090B] focus:ring-offset-2 transition-all duration-150 resize-none shadow-none"
+              id="catatan"
+              name="catatan"
+              placeholder="Tuliskan agenda atau kebutuhan tambahan..."
+              rows="3"
+            ></textarea>
+          </div>
+          <!-- Actions -->
+          <div class="space-y-md mt-md">
+            <div
+              class="flex justify-between items-center font-mono-data text-mono-data text-on-surface-variant"
+            >
+              <span class="">Durasi: 2 Jam</span>
+              <span class="font-semibold text-on-surface"
+                >Total: Rp 300.000</span
+              >
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 mt-xl pt-sm">
+            <button
+              class="text-[#6B7280] bg-transparent hover:bg-[#F3F4F6] border border-transparent rounded-sm px-4 py-2 font-body-base transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2 shadow-none"
+              type="button"
+            >
+              Batal
+            </button>
+            <button
+              class="bg-zinc-950 text-white px-4 py-2 rounded-sm hover:bg-zinc-800 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2 shadow-none font-body-base"
+              type="submit"
+            >
+              Konfirmasi Reservasi
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="id" style="">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SpaceSync - Detail Fasilitas</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-high": "#ebe7e7",
+              "on-primary-fixed": "#1c1b1d",
+              "surface-container-lowest": "#ffffff",
+              tertiary: "#000000",
+              "error-container": "#ffdad6",
+              "surface-container-highest": "#e5e2e1",
+              "on-background": "#1c1b1b",
+              "surface-tint": "#5f5e60",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#ebe0df",
+              "on-tertiary-fixed": "#1f1a1a",
+              "on-secondary-fixed-variant": "#404754",
+              "on-primary-fixed-variant": "#474649",
+              "surface-container-low": "#f7f3f2",
+              primary: "#000000",
+              "tertiary-container": "#1f1a1a",
+              "on-secondary-fixed": "#151c27",
+              "on-surface-variant": "#47464a",
+              "on-secondary-container": "#5e6572",
+              "surface-bright": "#fdf8f8",
+              "secondary-fixed": "#dce2f3",
+              "on-tertiary-container": "#8a8282",
+              "on-tertiary-fixed-variant": "#4c4545",
+              "inverse-primary": "#c8c6c8",
+              "secondary-fixed-dim": "#c0c7d6",
+              "on-error-container": "#93000a",
+              "on-primary": "#ffffff",
+              "surface-dim": "#ddd9d9",
+              "primary-fixed-dim": "#c8c6c8",
+              "on-surface": "#1c1b1b",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#858386",
+              "tertiary-fixed-dim": "#cec4c4",
+              outline: "#78767b",
+              "on-secondary": "#ffffff",
+              surface: "#fdf8f8",
+              secondary: "#585f6c",
+              "primary-fixed": "#e5e1e4",
+              error: "#ba1a1a",
+              "inverse-on-surface": "#f4f0ef",
+              "secondary-container": "#dce2f3",
+              "primary-container": "#1c1b1d",
+              "surface-variant": "#e5e2e1",
+              "inverse-surface": "#313030",
+              background: "#fdf8f8",
+              "surface-container": "#f1edec",
+              "outline-variant": "#c8c5ca",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            spacing: {
+              unit: "4px",
+              xs: "4px",
+              xl: "32px",
+              margin: "24px",
+              sm: "8px",
+              lg: "24px",
+              md: "16px",
+              gutter: "16px",
+            },
+            fontFamily: {
+              "mono-data": ["JetBrains Mono"],
+              "body-sm": ["Geist"],
+              "headline-sm": ["Geist"],
+              "headline-md": ["Geist"],
+              "body-base": ["Geist"],
+              "mono-label": ["JetBrains Mono"],
+              "headline-lg": ["Geist"],
+            },
+            fontSize: {
+              "mono-data": [
+                "13px",
+                {
+                  lineHeight: "18px",
+                  fontWeight: "400",
+                },
+              ],
+              "body-sm": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "24px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.015em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-base": [
+                "14px",
+                {
+                  lineHeight: "20px",
+                  fontWeight: "400",
+                },
+              ],
+              "mono-label": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.02em",
+                  fontWeight: "500",
+                },
+              ],
+              "headline-lg": [
+                "30px",
+                {
+                  lineHeight: "36px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Geist", sans-serif;
+        background-color: #fafafa;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+  <body class="bg-[#FAFAFA] text-on-surface">
+    <!-- Top Navigation -->
+    <nav
+      class="sticky top-0 left-0 right-0 w-full h-[56px] z-50 bg-white border-b border-[#E5E7EB] flex justify-between items-center px-lg"
+    >
+      <div
+        class="max-w-[1200px] mx-auto w-full flex justify-between items-center h-full"
+      >
+        <div class="flex items-center gap-lg">
+          <span class="font-headline-md text-headline-md font-bold text-primary"
+            >SpaceSync</span
+          >
+        </div>
+        <div class="hidden md:flex gap-lg font-body-base text-body-base">
+          <a
+            class="text-primary border-b-2 border-primary pb-1 font-semibold"
+            href="#"
+            >Jelajahi Fasilitas</a
+          >
+          <a
+            class="text-secondary hover:text-primary transition-colors duration-150"
+            href="#"
+            >Reservasi Saya</a
+          >
+        </div>
+        <div class="flex items-center gap-sm">
+          <button
+            aria-label="Notifications"
+            class="text-secondary hover:text-primary p-2 flex items-center justify-center scale-95 transition-transform duration-150"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            aria-label="Settings"
+            class="text-secondary hover:text-primary p-2 flex items-center justify-center scale-95 transition-transform duration-150"
+          >
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+          <div
+            class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center ml-sm cursor-pointer"
+          >
+            <span class="material-symbols-outlined text-secondary"
+              >account_circle</span
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div class="mb-6">
+        <a
+          class="inline-flex items-center text-on-surface-variant hover:text-primary transition-colors text-body-base font-body-base"
+          href="#"
+        >
+          <span class="material-symbols-outlined mr-1 text-sm">arrow_back</span>
+          Kembali ke Daftar Fasilitas
+        </a>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Details -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Visual Header -->
+          <div
+            class="h-[300px] bg-[#F3F4F6] border border-[#E5E7EB] rounded-lg flex items-center justify-center relative overflow-hidden group"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-surface-container-low to-surface-container-high opacity-50"
+            ></div>
+            <span
+              class="material-symbols-outlined text-[120px] text-primary/20 relative z-10"
+              data-icon="meeting_room"
+              >meeting_room</span
+            >
+          </div>
+          <!-- Header Info -->
+          <div class="space-y-4">
+            <div class="flex items-start justify-between flex-wrap gap-4">
+              <h1 class="font-headline-lg text-headline-lg text-primary">
+                Alpha Boardroom
+              </h1>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#D1FAE5] text-[#059669] border border-[#6EE7B7]"
+              >
+                Tersedia
+              </span>
+            </div>
+            <p
+              class="text-[#6B7280] font-body-base text-body-base leading-relaxed max-w-3xl"
+            >
+              Ruang rapat eksekutif bergaya modern dengan fasilitas audiovisual
+              lengkap, dirancang untuk memfasilitasi presentasi tingkat tinggi
+              dan diskusi strategis. Menawarkan privasi optimal dengan
+              pencahayaan alami yang dapat disesuaikan.
+            </p>
+          </div>
+          <!-- Technical Specs -->
+          <div class="pt-6 border-t border-[#E5E7EB]">
+            <h3 class="font-headline-sm text-headline-sm text-primary mb-6">
+              Spesifikasi Teknis
+            </h3>
+            <ul class="font-mono-data text-mono-data text-[#111827] space-y-0">
+              <li class="py-4 border-b border-[#E5E7EB] flex items-start gap-4">
+                <span
+                  class="material-symbols-outlined text-on-surface-variant"
+                  data-icon="groups"
+                  >groups</span
+                >
+                <div class="">
+                  <span
+                    class="block text-on-surface-variant text-xs mb-1 uppercase tracking-wider"
+                    >Kapasitas</span
+                  >
+                  12 Orang
+                </div>
+              </li>
+              <li class="py-4 border-b border-[#E5E7EB] flex items-start gap-4">
+                <span
+                  class="material-symbols-outlined text-on-surface-variant"
+                  data-icon="monitor"
+                  >monitor</span
+                >
+                <div class="">
+                  <span
+                    class="block text-on-surface-variant text-xs mb-1 uppercase tracking-wider"
+                    >Fasilitas</span
+                  >
+                  Layar 4K, Audio Polycom, Whiteboard Digital
+                </div>
+              </li>
+              <li class="py-4 border-b border-[#E5E7EB] flex items-start gap-4">
+                <span
+                  class="material-symbols-outlined text-on-surface-variant"
+                  data-icon="aspect_ratio"
+                  >aspect_ratio</span
+                >
+                <div class="">
+                  <span
+                    class="block text-on-surface-variant text-xs mb-1 uppercase tracking-wider"
+                    >Luas</span
+                  >
+                  45m2
+                </div>
+              </li>
+              <li class="py-4 border-b border-[#E5E7EB] flex items-start gap-4">
+                <span
+                  class="material-symbols-outlined text-on-surface-variant"
+                  data-icon="wifi"
+                  >wifi</span
+                >
+                <div class="">
+                  <span
+                    class="block text-on-surface-variant text-xs mb-1 uppercase tracking-wider"
+                    >Konektivitas</span
+                  >
+                  Wi-Fi 6 Dedicated (Up to 1Gbps)
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- Right Column: Booking Panel -->
+        <div class="lg:col-span-1">
+          <div
+            class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg p-6 sticky top-24"
+          >
+            <div
+              class="flex items-baseline gap-1 pb-4 mb-6 border-b border-[#E5E7EB]"
+            >
+              <span
+                class="text-[24px] font-semibold text-[#111827] leading-none"
+                >Rp 150.000</span
+              ><span class="text-sm text-[#6B7280]">/ jam</span>
+            </div>
+            <h2 class="font-headline-sm text-headline-sm text-primary mb-6">
+              Reservasi Ruangan
+            </h2>
+            <form class="space-y-5">
+              <div>
+                <label
+                  class="block font-mono-label text-mono-label text-on-surface mb-2"
+                  for="booking_date"
+                  >Tanggal Reservasi</label
+                >
+                <div class="relative">
+                  <span
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    ><span
+                      class="material-symbols-outlined text-on-surface-variant text-sm"
+                      >calendar_today</span
+                    ></span
+                  ><input
+                    class="block w-full pl-10 pr-3 py-2 bg-transparent border border-[#E5E7EB] rounded-DEFAULT font-mono-data text-mono-data text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-transparent focus:ring-offset-2 focus:ring-offset-white transition-all"
+                    id="booking_date"
+                    name="booking_date"
+                    type="date"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  class="block font-mono-label text-mono-label text-on-surface mb-2"
+                  for="start_time"
+                  >Waktu Mulai</label
+                >
+                <div class="relative">
+                  <span
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    ><span
+                      class="material-symbols-outlined text-on-surface-variant text-sm"
+                      >schedule</span
+                    ></span
+                  ><input
+                    class="block w-full pl-10 pr-3 py-2 bg-transparent border border-[#E5E7EB] rounded-DEFAULT font-mono-data text-mono-data text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-transparent focus:ring-offset-2 focus:ring-offset-white transition-all"
+                    id="start_time"
+                    name="start_time"
+                    type="time"
+                    placeholder="22:20"
+                  />
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <label
+                    for="custom_duration"
+                    class="block font-mono-label text-mono-label text-on-surface mb-2"
+                    >Durasi (jam)</label
+                  >
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                    >
+                      <span
+                        class="material-symbols-outlined text-on-surface-variant text-sm"
+                        >timer</span
+                      >
+                    </span>
+                    <input
+                      type="number"
+                      id="custom_duration"
+                      name="duration"
+                      class="block w-full pl-10 pr-3 py-2 bg-transparent border border-[#E5E7EB] rounded-DEFAULT font-mono-data text-mono-data text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:border-transparent focus:ring-offset-2 focus:ring-offset-white transition-all"
+                      value="2"
+                      placeholder="2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="pt-4 mt-4 border-t border-[#E5E7EB] space-y-3">
+                <div
+                  class="flex justify-between items-center font-mono-data text-mono-data"
+                >
+                  <span class="text-[#6B7280]">Durasi</span>
+                  <span class="font-medium text-[#111827]">2 Jam</span>
+                </div>
+                <div
+                  class="flex justify-between items-center font-mono-data text-mono-data"
+                >
+                  <span class="text-[#6B7280]">Total Biaya</span>
+                  <span class="font-semibold text-[#111827] text-lg"
+                    >Rp 300.000</span
+                  >
+                </div>
+              </div>
+              <button
+                class="w-full font-mono-label text-mono-label py-3 px-4 rounded-sm mt-4 flex items-center justify-center gap-2 bg-[#09090B] text-white cursor-pointer transition-colors duration-150"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >bookmark_add</span
+                >Pesan Ruangan
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 w-full bg-surface dark:bg-background border-t border-outline-variant flex justify-around items-center h-16 z-50"
+    >
+      <a
+        class="flex flex-col items-center justify-center w-full h-full text-primary font-bold bg-surface-container-low transition-colors duration-150"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined mb-1"
+          data-icon="search"
+          data-weight="fill"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >search</span
+        >
+        <span class="font-mono-label text-[10px] leading-none"
+          >Jelajahi Fasilitas</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant font-medium hover:bg-surface-container-low transition-colors duration-150"
+        href="#"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="calendar_today"
+          >calendar_today</span
+        >
+        <span class="font-mono-label text-[10px] leading-none"
+          >Reservasi Saya</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center w-full h-full text-on-surface-variant font-medium hover:bg-surface-container-low transition-colors duration-150"
+        href="#"
+      >
+        <span class="material-symbols-outlined mb-1" data-icon="person"
+          >person</span
+        >
+        <span class="font-mono-label text-[10px] leading-none">Profil</span>
+      </a>
+    </nav>
+  </body>
+</html>

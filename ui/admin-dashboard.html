@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Dashboard - SpaceSync</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#09090B",
+              secondary: "#6B7280",
+              surface: "#FFFFFF",
+              "on-surface": "#111827",
+              "on-surface-variant": "#6B7280",
+            },
+            fontFamily: {
+              "body-base": ["Geist"],
+              "headline-md": ["Geist"],
+              "headline-sm": ["Geist"],
+              "headline-lg": ["Geist"],
+              "mono-label": ["JetBrains Mono"],
+              "mono-data": ["JetBrains Mono"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-[#FAFAFA] text-[#111827] font-body-base antialiased min-h-screen flex"
+  >
+    <!-- LEFT SIDEBAR ADMIN -->
+    <aside
+      class="w-64 h-screen sticky top-0 bg-[#FFFFFF] border-r border-[#E5E7EB] flex flex-col z-50"
+    >
+      <!-- Header Sidebar -->
+      <div class="h-[64px] flex items-center px-6 border-b border-[#E5E7EB]">
+        <span class="font-headline-md text-[20px] font-bold text-[#09090B]"
+          >SpaceSync <span class="text-[#6B7280] font-normal">Admin</span></span
+        >
+      </div>
+
+      <!-- Navigasi Utama -->
+      <nav class="flex-1 px-4 py-6 flex flex-col gap-2">
+        <!-- Menu Aktif -->
+        <a
+          class="flex items-center gap-3 px-3 py-2 bg-[#F3F4F6] text-[#09090B] font-medium rounded-md border border-[#E5E7EB]"
+          href="#"
+        >
+          <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          Dashboard
+        </a>
+        <!-- Menu Pasif -->
+        <a
+          class="flex items-center gap-3 px-3 py-2 text-[#6B7280] hover:bg-[#FAFAFA] hover:text-[#09090B] rounded-md transition-colors"
+          href="#"
+        >
+          <span class="material-symbols-outlined text-[20px]">book_online</span>
+          Manajemen Reservasi
+        </a>
+        <a
+          class="flex items-center gap-3 px-3 py-2 text-[#6B7280] hover:bg-[#FAFAFA] hover:text-[#09090B] rounded-md transition-colors"
+          href="#"
+        >
+          <span class="material-symbols-outlined text-[20px]"
+            >meeting_room</span
+          >
+          Master Fasilitas
+        </a>
+      </nav>
+
+      <!-- Footer Sidebar (Profil & Utilitas) -->
+      <div class="p-4 border-t border-[#E5E7EB] flex flex-col gap-4">
+        <button
+          class="flex items-center gap-3 px-3 py-2 text-[#6B7280] hover:text-[#09090B] hover:bg-[#FAFAFA] rounded-md transition-colors w-full text-left relative"
+        >
+          <span class="material-symbols-outlined text-[20px]"
+            >notifications</span
+          >
+          Notifikasi
+          <span
+            class="absolute right-4 top-3 w-2 h-2 bg-[#09090B] rounded-full"
+          ></span>
+        </button>
+
+        <div class="flex items-center gap-3 px-3 pt-2">
+          <div
+            class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center border border-[#E5E7EB]"
+          >
+            <span class="material-symbols-outlined text-[16px] text-[#6B7280]"
+              >admin_panel_settings</span
+            >
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[14px] font-medium text-[#09090B] leading-tight"
+              >Admin Enigma</span
+            >
+            <span class="text-[12px] text-[#6B7280] leading-tight mt-0.5"
+              >admin@enigma.com</span
+            >
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTAINER KONTEN UTAMA -->
+    <main class="flex-1 flex flex-col min-h-screen">
+      <!-- Top Header Halaman (Opsional untuk Judul Halaman) -->
+      <header
+        class="w-full h-[64px] bg-[#FFFFFF] border-b border-[#E5E7EB] flex items-center px-8"
+      >
+        <h1 class="font-headline-sm text-[18px] font-semibold text-[#111827]">
+          Dashboard Induk
+        </h1>
+      </header>
+
+      <!-- Area Render Komponen -->
+      <div class="p-8 flex flex-col gap-6 w-full max-w-[1400px]">
+        <!-- Konten Admin disuntikkan ke sini -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full">
+          <!-- Card 1: Total Reservasi -->
+          <div
+            class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-6 flex flex-col justify-between gap-4 hover:border-[#D1D5DB] transition-colors duration-150"
+          >
+            <div class="flex justify-between items-start">
+              <span class="font-body-base text-[#6B7280]"
+                >Total Reservasi Hari Ini</span
+              >
+              <span class="material-symbols-outlined text-[#9CA3AF] text-[20px]"
+                >book_online</span
+              >
+            </div>
+            <div class="flex flex-col gap-1">
+              <span
+                class="font-mono-data text-[32px] font-medium text-[#09090B] leading-none"
+                >124</span
+              >
+              <div class="flex items-center gap-1 mt-1">
+                <span
+                  class="flex items-center text-[#059669] font-mono-data text-[12px]"
+                >
+                  <span class="material-symbols-outlined text-[14px]"
+                    >arrow_upward</span
+                  >12%
+                </span>
+                <span class="font-body-base text-[12px] text-[#6B7280]"
+                  >vs kemarin</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Fasilitas Aktif -->
+          <div
+            class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-6 flex flex-col justify-between gap-4 hover:border-[#D1D5DB] transition-colors duration-150"
+          >
+            <div class="flex justify-between items-start">
+              <span class="font-body-base text-[#6B7280]">Fasilitas Aktif</span>
+              <span class="material-symbols-outlined text-[#9CA3AF] text-[20px]"
+                >meeting_room</span
+              >
+            </div>
+            <div class="flex flex-col gap-1">
+              <div class="flex items-baseline gap-1">
+                <span
+                  class="font-mono-data text-[32px] font-medium text-[#09090B] leading-none"
+                  >38</span
+                >
+                <span class="font-mono-data text-[14px] text-[#6B7280]"
+                  >/40</span
+                >
+              </div>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>
+                <span class="font-body-base text-[12px] text-[#6B7280]"
+                  >2 dalam perbaikan</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Menunggu Persetujuan -->
+          <div
+            class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-6 flex flex-col justify-between gap-4 hover:border-[#D1D5DB] transition-colors duration-150"
+          >
+            <div class="flex justify-between items-start">
+              <span class="font-body-base text-[#6B7280]"
+                >Menunggu Persetujuan</span
+              >
+              <span class="material-symbols-outlined text-[#9CA3AF] text-[20px]"
+                >pending_actions</span
+              >
+            </div>
+            <div class="flex flex-col gap-1">
+              <span
+                class="font-mono-data text-[32px] font-medium text-[#09090B] leading-none"
+                >12</span
+              >
+              <div class="flex items-center gap-1 mt-1">
+                <span
+                  class="flex items-center text-[#DC2626] font-mono-data text-[12px]"
+                >
+                  <span class="material-symbols-outlined text-[14px]"
+                    >priority_high</span
+                  >3 mendesak
+                </span>
+                <span class="font-body-base text-[12px] text-[#6B7280]"
+                  >butuh tinjauan</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Tingkat Okupansi -->
+          <div
+            class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-6 flex flex-col justify-between gap-4 hover:border-[#D1D5DB] transition-colors duration-150"
+          >
+            <div class="flex justify-between items-start">
+              <span class="font-body-base text-[#6B7280]"
+                >Tingkat Okupansi</span
+              >
+              <span class="material-symbols-outlined text-[#9CA3AF] text-[20px]"
+                >analytics</span
+              >
+            </div>
+            <div class="flex flex-col gap-1">
+              <span
+                class="font-mono-data text-[32px] font-medium text-[#09090B] leading-none"
+                >82%</span
+              >
+              <div class="flex items-center gap-1 mt-1">
+                <span
+                  class="flex items-center text-[#059669] font-mono-data text-[12px]"
+                >
+                  <span class="material-symbols-outlined text-[14px]"
+                    >arrow_upward</span
+                  >4.5%
+                </span>
+                <span class="font-body-base text-[12px] text-[#6B7280]"
+                  >vs minggu lalu</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md flex flex-col w-full"
+        >
+          <div
+            class="p-6 border-b border-[#E5E7EB] flex justify-between items-center bg-[#FFFFFF] rounded-t-md"
+          >
+            <h2 class="font-body-base font-semibold text-[18px] text-[#111827]">
+              Reservasi Terbaru
+            </h2>
+            <button
+              class="bg-[#09090B] hover:bg-[#27272A] text-[#FFFFFF] px-4 py-2 rounded-sm font-medium transition-colors font-body-base"
+            >
+              Lihat Semua
+            </button>
+          </div>
+          <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#E5E7EB] bg-[#FAFAFA]">
+                  <th
+                    class="px-6 py-4 font-body-base text-[#6B7280] font-medium"
+                  >
+                    ID Reservasi
+                  </th>
+                  <th
+                    class="px-6 py-4 font-body-base text-[#6B7280] font-medium"
+                  >
+                    Peminjam
+                  </th>
+                  <th
+                    class="px-6 py-4 font-body-base text-[#6B7280] font-medium"
+                  >
+                    Fasilitas
+                  </th>
+                  <th
+                    class="px-6 py-4 font-body-base text-[#6B7280] font-medium"
+                  >
+                    Slot Waktu
+                  </th>
+                  <th
+                    class="px-6 py-4 font-body-base text-[#6B7280] font-medium"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="font-body-base text-[#111827]">
+                <tr
+                  class="border-b border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors bg-[#FFFFFF]"
+                >
+                  <td class="px-6 py-4 font-mono-data text-[#09090B]">
+                    REQ-8891
+                  </td>
+                  <td class="px-6 py-4">Tim Edupath</td>
+                  <td class="px-6 py-4">Alpha Boardroom</td>
+                  <td class="px-6 py-4 font-mono-data text-[#6B7280]">
+                    24 Okt 2026, 09:00 - 11:00
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex px-2 py-1 bg-[#ECFDF5] text-[#059669] font-mono-data text-[12px] rounded-sm border border-[#A1DFC3]"
+                      >Confirmed</span
+                    >
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors bg-[#FFFFFF]"
+                >
+                  <td class="px-6 py-4 font-mono-data text-[#09090B]">
+                    REQ-8892
+                  </td>
+                  <td class="px-6 py-4">Tim Edupath</td>
+                  <td class="px-6 py-4">Creative Studio A</td>
+                  <td class="px-6 py-4 font-mono-data text-[#6B7280]">
+                    24 Okt 2026, 13:00 - 15:00
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex px-2 py-1 bg-[#FFFFFF] text-[#111827] font-mono-data text-[12px] rounded-sm border border-[#D1D5DB]"
+                      >Pending</span
+                    >
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-[#E5E7EB] hover:bg-[#F3F4F6] transition-colors bg-[#FFFFFF]"
+                >
+                  <td class="px-6 py-4 font-mono-data text-[#09090B]">
+                    REQ-8893
+                  </td>
+                  <td class="px-6 py-4">Tim Edupath</td>
+                  <td class="px-6 py-4">Focus Pod 1</td>
+                  <td class="px-6 py-4 font-mono-data text-[#6B7280]">
+                    25 Okt 2026, 10:00 - 12:00
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex px-2 py-1 bg-[#FEF2F2] text-[#DC2626] font-mono-data text-[12px] rounded-sm border border-[#FECACA]"
+                      >Cancelled</span
+                    >
+                  </td>
+                </tr>
+                <tr
+                  class="hover:bg-[#F3F4F6] transition-colors bg-[#FFFFFF] rounded-b-md"
+                >
+                  <td class="px-6 py-4 font-mono-data text-[#09090B]">
+                    REQ-8894
+                  </td>
+                  <td class="px-6 py-4">Tim Edupath</td>
+                  <td class="px-6 py-4">Sigma Video Conf</td>
+                  <td class="px-6 py-4 font-mono-data text-[#6B7280]">
+                    25 Okt 2026, 15:00 - 17:00
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="inline-flex px-2 py-1 bg-[#ECFDF5] text-[#059669] font-mono-data text-[12px] rounded-sm border border-[#A1DFC3]"
+                      >Confirmed</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

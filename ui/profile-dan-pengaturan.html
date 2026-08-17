@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Profil & Pengaturan - SpaceSync</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#f4f0ef",
+              "surface-tint": "#5f5e60",
+              "inverse-primary": "#c8c6c8",
+              "secondary-fixed-dim": "#c0c7d6",
+              "on-error-container": "#93000a",
+              secondary: "#585f6c",
+              "surface-variant": "#e5e2e1",
+              outline: "#78767b",
+              "surface-container": "#f1edec",
+              "primary-container": "#1c1b1d",
+              "on-primary-fixed-variant": "#474649",
+              "on-primary-fixed": "#1c1b1d",
+              "on-surface": "#1c1b1b",
+              "surface-container-high": "#ebe7e7",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed-variant": "#404754",
+              background: "#fdf8f8",
+              "primary-fixed": "#e5e1e4",
+              primary:
+                "#09090B" /* Disesuaikan ke Zinc-950 berdasarkan Design System */,
+              "inverse-surface": "#313030",
+              "secondary-fixed": "#dce2f3",
+              "on-error": "#ffffff",
+              "on-surface-variant": "#47464a",
+              "on-secondary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              error:
+                "#DC2626" /* Disesuaikan ke Merah berdasarkan Design System */,
+              "surface-dim": "#ddd9d9",
+              "surface-container-highest": "#e5e2e1",
+              "on-tertiary-fixed": "#1f1a1a",
+              "error-container": "#ffdad6",
+              "surface-container-low":
+                "#FAFAFA" /* Disesuaikan ke Level 0 berdasarkan Design System */,
+              "on-primary": "#ffffff",
+              "on-tertiary-fixed-variant": "#4c4545",
+              "secondary-container": "#dce2f3",
+              "surface-bright": "#fdf8f8",
+              "outline-variant": "#c8c5ca",
+              "on-secondary-container": "#5e6572",
+              "primary-fixed-dim": "#c8c6c8",
+              "tertiary-container": "#1f1a1a",
+              surface: "#fdf8f8",
+              "on-secondary-fixed": "#151c27",
+              "on-tertiary-container": "#8a8282",
+              "on-primary-container": "#858386",
+              "tertiary-fixed": "#ebe0df",
+              "tertiary-fixed-dim": "#cec4c4",
+              tertiary: "#000000",
+              "on-background": "#1c1b1b",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem" /* 4px */,
+              sm: "0.125rem",
+              md: "0.375rem" /* 6px */,
+              lg: "0.5rem" /* 8px */,
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              xs: "4px",
+              sm: "8px",
+              md: "16px",
+              lg: "24px",
+              xl: "32px",
+              gutter: "16px",
+            },
+            fontFamily: {
+              "headline-sm": ["Geist"],
+              "headline-lg": ["Geist"],
+              "mono-label": ["JetBrains Mono"],
+              "mono-data": ["JetBrains Mono"],
+              "body-sm": ["Geist"],
+              "headline-md": ["Geist"],
+              "body-base": ["Geist"],
+            },
+            fontSize: {
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "24px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-lg": [
+                "30px",
+                {
+                  lineHeight: "36px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "mono-label": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.02em",
+                  fontWeight: "500",
+                },
+              ],
+              "mono-data": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+              "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.015em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-base": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="text-on-surface font-body-base antialiased min-h-screen flex flex-col bg-surface-container-low"
+  >
+    <!-- Top Navigation Bar -->
+    <nav
+      class="sticky top-0 left-0 right-0 w-full h-[56px] z-50 bg-[#FFFFFF] border-b border-[#E5E7EB] flex justify-center items-center"
+    >
+      <div
+        class="w-full max-w-[1200px] flex justify-between items-center px-lg h-full"
+      >
+        <div class="flex items-center gap-lg">
+          <span class="font-headline-md text-headline-md font-bold text-primary"
+            >SpaceSync</span
+          >
+        </div>
+
+        <!-- Koreksi Navbar: Hanya 2 Menu Pasif -->
+        <div class="hidden md:flex gap-lg font-body-base text-body-base">
+          <a
+            class="text-secondary hover:text-primary transition-colors duration-150"
+            href="#"
+            >Jelajahi Fasilitas</a
+          >
+          <a
+            class="text-secondary hover:text-primary transition-colors duration-150"
+            href="#"
+            >Reservasi Saya</a
+          >
+        </div>
+
+        <div class="flex items-center gap-sm">
+          <button
+            aria-label="Notifications"
+            class="text-secondary hover:text-primary p-2 flex items-center justify-center scale-95 transition-transform duration-150"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            aria-label="Settings"
+            class="text-secondary hover:text-primary p-2 flex items-center justify-center scale-95 transition-transform duration-150"
+          >
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+          <div
+            class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center ml-sm cursor-pointer border border-[#E5E7EB]"
+          >
+            <span class="material-symbols-outlined text-secondary"
+              >account_circle</span
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main
+      class="flex-1 w-full max-w-[1200px] mx-auto px-lg py-xl flex flex-col gap-xl"
+    >
+      <!-- 1. Page Header -->
+      <header>
+        <h1 class="font-headline-lg text-headline-lg text-primary mb-sm">
+          Profil & Pengaturan
+        </h1>
+        <p class="font-body-base text-body-base text-secondary max-w-2xl">
+          Kelola identitas, integrasi sistem, dan parameter jadwal rutinitas
+          Anda.
+        </p>
+      </header>
+
+      <!-- 2. Tata Letak Utama (Grid 4 Kolom) -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-lg items-start">
+        <!-- 3. Kolom Kiri (Profil Card - col-span-1) -->
+        <div
+          class="col-span-1 bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-lg flex flex-col items-center"
+        >
+          <!-- Avatar & Identitas -->
+          <div
+            class="w-24 h-24 bg-[#F3F4F6] rounded-full flex items-center justify-center mb-md border border-[#E5E7EB]"
+          >
+            <span class="material-symbols-outlined text-[48px] text-secondary"
+              >account_circle</span
+            >
+          </div>
+          <h2 class="font-headline-sm text-headline-sm text-primary mb-xs">
+            Nama Pengguna
+          </h2>
+          <p class="font-body-base text-body-base text-secondary mb-md">
+            Backend Developer
+          </p>
+          <span
+            class="bg-[#F4F4F5] border border-[#E5E7EB] rounded px-2 py-1 font-mono-label text-mono-label text-primary mb-lg"
+            >Tim Edupath</span
+          >
+
+          <!-- Menu Vertikal -->
+          <div
+            class="w-full flex flex-col border-t border-[#E5E7EB] pt-lg gap-sm"
+          >
+            <a
+              href="#"
+              class="font-body-base text-primary bg-[#F9FAFB] px-md py-2 rounded font-medium border border-[#E5E7EB]"
+              >Preferensi Jadwal</a
+            >
+            <a
+              href="#"
+              class="font-body-base text-secondary hover:text-primary hover:bg-[#F9FAFB] px-md py-2 rounded transition-colors"
+              >Keamanan & API</a
+            >
+            <a
+              href="#"
+              class="font-body-base text-error hover:bg-[#FEF2F2] px-md py-2 rounded transition-colors mt-md"
+              >Keluar</a
+            >
+          </div>
+        </div>
+
+        <!-- 4. Kolom Kanan (Konten Pengaturan - col-span-3) -->
+        <div class="col-span-1 md:col-span-3 flex flex-col gap-lg">
+          <!-- KARTU 1: Informasi Personal -->
+          <div class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-lg">
+            <h3 class="font-headline-sm text-headline-sm text-primary mb-lg">
+              Informasi Personal
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+              <div class="flex flex-col gap-xs">
+                <label class="font-body-sm text-secondary">Nama Lengkap</label>
+                <input
+                  type="text"
+                  value="Nama Pengguna"
+                  class="border border-[#D1D5DB] rounded px-md py-2 font-body-base text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:ring-offset-2 transition-shadow h-10 bg-transparent"
+                />
+              </div>
+              <div class="flex flex-col gap-xs">
+                <label class="font-body-sm text-secondary">Alamat Email</label>
+                <input
+                  type="email"
+                  value="developer@edupath.com"
+                  class="border border-[#D1D5DB] rounded px-md py-2 font-body-base text-primary focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:ring-offset-2 transition-shadow h-10 bg-transparent"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- KARTU 2: Rutinitas Terkunci / Blocked Hours -->
+          <div class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-lg">
+            <div class="mb-lg">
+              <h3 class="font-headline-sm text-headline-sm text-primary mb-xs">
+                Jadwal Tak Tersedia
+              </h3>
+              <p class="font-body-base text-secondary">
+                Sistem tidak akan merekomendasikan ruangan pada jam-jam berikut.
+              </p>
+            </div>
+
+            <div class="flex flex-col mb-lg">
+              <!-- Baris 1 -->
+              <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-md border-b border-[#E5E7EB] gap-sm"
+              >
+                <span class="font-body-base text-primary font-medium"
+                  >Sesi Gym & Meal Prep (1900 Kkal)</span
+                >
+                <span class="font-mono-data text-mono-data text-secondary"
+                  >Senin, Rabu, Jumat • 12:00 - 14:00</span
+                >
+              </div>
+              <!-- Baris 2 -->
+              <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-md border-b border-[#E5E7EB] gap-sm"
+              >
+                <span class="font-body-base text-primary font-medium"
+                  >Kelas Wajib Akademik</span
+                >
+                <span class="font-mono-data text-mono-data text-secondary"
+                  >Selasa, Kamis • 08:00 - 10:00</span
+                >
+              </div>
+            </div>
+
+            <button
+              class="border border-[#E5E7EB] text-primary hover:bg-[#F9FAFB] hover:border-[#D1D5DB] h-10 px-4 rounded font-medium transition-colors flex items-center justify-center"
+            >
+              Tambah Rutinitas
+            </button>
+          </div>
+
+          <!-- KARTU 3: Integrasi Sistem -->
+          <!-- KARTU 3: Preferensi Notifikasi -->
+          <div class="bg-[#FFFFFF] border border-[#E5E7EB] rounded-md p-lg">
+            <h3 class="font-headline-sm text-headline-sm text-primary mb-md">
+              Notifikasi & Pengingat
+            </h3>
+
+            <div class="flex flex-col">
+              <!-- Baris 1: Email Pemberitahuan -->
+              <div
+                class="flex justify-between items-center py-md border-b border-[#E5E7EB] gap-md"
+              >
+                <div class="flex flex-col gap-xs">
+                  <span class="font-body-base text-primary font-medium"
+                    >Email Pemberitahuan</span
+                  >
+                  <span class="font-body-base text-secondary"
+                    >Kirimkan bukti reservasi dan pembatalan ke email.</span
+                  >
+                </div>
+
+                <!-- Toggle Aktif -->
+                <button
+                  type="button"
+                  class="bg-[#09090B] relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:ring-offset-2"
+                  role="switch"
+                  aria-checked="true"
+                >
+                  <span class="sr-only">Toggle Email Pemberitahuan</span>
+                  <span
+                    aria-hidden="true"
+                    class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#FFFFFF] border border-[#E5E7EB] transition duration-200 ease-in-out"
+                  ></span>
+                </button>
+              </div>
+
+              <!-- Baris 2: Pengingat Jadwal -->
+              <div class="flex justify-between items-center pt-md gap-md">
+                <div class="flex flex-col gap-xs">
+                  <span class="font-body-base text-primary font-medium"
+                    >Pengingat Jadwal</span
+                  >
+                  <span class="font-body-base text-secondary"
+                    >Ingatkan 30 menit sebelum reservasi dimulai.</span
+                  >
+                </div>
+
+                <!-- Toggle Aktif -->
+                <button
+                  type="button"
+                  class="bg-[#09090B] relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#09090B] focus:ring-offset-2"
+                  role="switch"
+                  aria-checked="true"
+                >
+                  <span class="sr-only">Toggle Pengingat Jadwal</span>
+                  <span
+                    aria-hidden="true"
+                    class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#FFFFFF] border border-[#E5E7EB] transition duration-200 ease-in-out"
+                  ></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
