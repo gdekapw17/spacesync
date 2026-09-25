@@ -706,6 +706,7 @@ Untuk kesiapan operasional pada arsitektur berbasis kontainer (Docker / Kubernet
 
 Modul `HealthModule` mengekspos endpoint `/api/v1/health` yang membedakan kesiapan operasional server:
 
+- **Full Health Check (`/api/v1/health`):** Agregat penuh pemeriksaan basis data dan alokasi heap memori untuk status keseluruhan sistem.
 - **Liveness Probe (`/api/v1/health/liveness`):** Memverifikasi apakah event loop aplikasi tetap hidup dan penggunaan alokasi heap memori berada dalam ambang batas aman.
 - **Readiness Probe (`/api/v1/health/readiness`):** Memverifikasi bahwa Prisma Client berhasil melakukan _ping_ ke basis data PostgreSQL dan dapat menerima query sebelum menerima trafik jaringan dari Ingress/Load Balancer.
 
@@ -728,6 +729,15 @@ export class HealthController {
     private prismaHealth: PrismaHealthIndicator,
     private prisma: PrismaService,
   ) {}
+
+  @Get()
+  @HealthCheck()
+  check() {
+    return this.health.check([
+      () => this.memory.checkHeap("memory_heap", 300 * 1024 * 1024), // 300MB
+      () => this.prismaHealth.pingCheck("database", this.prisma),
+    ]);
+  }
 
   @Get("liveness")
   @HealthCheck()
