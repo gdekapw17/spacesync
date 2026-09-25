@@ -205,11 +205,14 @@ SpaceSync hadir sebagai platform manajemen reservasi ruangan yang mengedepankan 
 │                                     [Wajib Isi Alasan Penolakan]
 │                                     │
 ▼                                     ▼
-[PATCH /bookings/:id/approve]         [PATCH /bookings/:id/reject]
+[Payload: { status: "APPROVED" }]     [Payload: { status: "REJECTED", rejectionReason }]
 │                                     │
-├─────────────────────────────────────┘
-│
-▼
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+     [Kirim PATCH /api/v1/bookings/:id/status]
+                   │
+                   ▼
 [Database Transaction]
 - Mutasi Status (APPROVED / REJECTED)
 - Tulis Rekam Jejak ke AuditLog
