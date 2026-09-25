@@ -89,6 +89,7 @@ model Room {
   capacity      Int                @db.Integer
   location      String             @db.VarChar(255)
   status        RoomStatus         @default(AVAILABLE)
+  timezone      String             @default("Asia/Jakarta") @db.VarChar(50)
   bufferMinutes Int                @default(15) @map("buffer_minutes") @db.Integer
   managerId     String?            @map("manager_id") @db.Uuid
   createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -135,6 +136,7 @@ model MaintenanceBlock {
   title              String   @db.VarChar(150)
   reason             String   @db.Text
   startTime          DateTime @map("start_time") @db.Timestamptz(6)
+  endTime            DateTime @map("end_time") @db.Timestamptz(6)
   operationalEndTime DateTime @map("operational_end_time") @db.Timestamptz(6)
   createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
@@ -215,15 +217,57 @@ model AuditLog {
 
 ### 3.3 Kamus Entitas Pengguna & Autentikasi (`users`)
 
-| Kolom                  | Tipe Data       | Nullable | Nilai Default | Penjelasan Fungsional                                              |
-| ---------------------- | --------------- | -------- | ------------- | ------------------------------------------------------------------ |
-| `id`                   | `UUID`          | No       | `uuid()`      | Identifikator unik primer pengguna (PK).                           |
-| `email`                | `VARCHAR(255)`  | No       | -             | Alamat email unik untuk kredensial autentikasi.                    |
-| `password_hash`        | `VARCHAR(255)`  | No       | -             | Hash password akun (Argon2id / bcrypt).                            |
-| `hashed_refresh_token` | `VARCHAR(255)`  | Yes      | `NULL`        | Hash refresh token aktif untuk validasi rotasi & sesi persistensi. |
-| `role`                 | `Role`          | No       | `'USER'`      | Peran hak akses (`SUPER_ADMIN`, `ROOM_MANAGER`, `USER`).           |
-| `created_at`           | `TIMESTAMPTZ`   | No       | `now()`       | Timestamp pembuatan akun pengguna (UTC).                           |
-| `updated_at`           | `TIMESTAMPTZ`   | No       | `now()`       | Timestamp pembaruan data pengguna (UTC).                           |
+| Kolom                  | Tipe Data      | Nullable | Nilai Default | Penjelasan Fungsional                                              |
+| ---------------------- | -------------- | -------- | ------------- | ------------------------------------------------------------------ |
+| `id`                   | `UUID`         | No       | `uuid()`      | Identifikator unik primer pengguna (PK).                           |
+| `email`                | `VARCHAR(255)` | No       | -             | Alamat email unik untuk kredensial autentikasi.                    |
+| `password_hash`        | `VARCHAR(255)` | No       | -             | Hash password akun (Argon2id / bcrypt).                            |
+| `hashed_refresh_token` | `VARCHAR(255)` | Yes      | `NULL`        | Hash refresh token aktif untuk validasi rotasi & sesi persistensi. |
+| `role`                 | `Role`         | No       | `'USER'`      | Peran hak akses (`SUPER_ADMIN`, `ROOM_MANAGER`, `USER`).           |
+| `created_at`           | `TIMESTAMPTZ`  | No       | `now()`       | Timestamp pembuatan akun pengguna (UTC).                           |
+| `updated_at`           | `TIMESTAMPTZ`  | No       | `now()`       | Timestamp pembaruan data pengguna (UTC).                           |
+
+### 3.4 Kamus Entitas Ruangan (`rooms`)
+
+| Kolom            | Tipe Data      | Nullable | Nilai Default    | Penjelasan Fungsional                                              |
+| ---------------- | -------------- | -------- | ---------------- | ------------------------------------------------------------------ |
+| `id`             | `UUID`         | No       | `uuid()`         | Identifikator unik primer ruangan (PK).                            |
+| `name`           | `VARCHAR(100)` | No       | -                | Nama fisik ruangan/fasilitas.                                      |
+| `code`           | `VARCHAR(30)`  | No       | -                | Kode unik ruangan (Unique constraint).                             |
+| `capacity`       | `INTEGER`      | No       | -                | Kapasitas maksimal peserta/orang.                                  |
+| `location`       | `VARCHAR(255)` | No       | -                | Lokasi fisik (lantai, sayap, gedung).                              |
+| `status`         | `RoomStatus`   | No       | `'AVAILABLE'`    | Status operasional (`AVAILABLE`, `MAINTENANCE`, `INACTIVE`).        |
+| `timezone`       | `VARCHAR(50)`  | No       | `'Asia/Jakarta'` | Zona waktu IANA lokal ruangan untuk normalisasi kalender.          |
+| `buffer_minutes` | `INTEGER`      | No       | `15`             | Durasi jeda pembersihan standar pasca-penggunaan (menit).          |
+| `manager_id`     | `UUID`         | Yes      | `NULL`           | Foreign Key ke tabel `users.id` (aktor `ROOM_MANAGER`).            |
+| `created_at`     | `TIMESTAMPTZ`  | No       | `now()`          | Timestamp pembuatan data ruangan (UTC).                            |
+| `updated_at`     | `TIMESTAMPTZ`  | No       | `now()`          | Timestamp pembaruan data ruangan (UTC).                            |
+
+### 3.5 Kamus Entitas Blok Pemeliharaan (`maintenance_blocks`)
+
+| Kolom                  | Tipe Data      | Nullable | Nilai Default | Penjelasan Fungsional                                              |
+| ---------------------- | -------------- | -------- | ------------- | ------------------------------------------------------------------ |
+| `id`                   | `UUID`         | No       | `uuid()`      | Identifikator unik primer blok pemeliharaan (PK).                  |
+| `room_id`              | `UUID`         | No       | -             | Foreign Key ke tabel `rooms.id`.                                   |
+| `title`                | `VARCHAR(150)` | No       | -             | Judul/nama agenda pemeliharaan.                                    |
+| `reason`               | `TEXT`         | No       | -             | Rincian deskripsi teknis alasan pemeliharaan.                      |
+| `start_time`           | `TIMESTAMPTZ`  | No       | -             | Waktu mulai pemeliharaan (UTC).                                    |
+| `end_time`             | `TIMESTAMPTZ`  | No       | -             | Waktu selesai pemeliharaan (UTC).                                  |
+| `operational_end_time` | `TIMESTAMPTZ`  | No       | -             | Batas akhir kuncian slot ketersediaan ruangan (UTC).               |
+| `created_at`           | `TIMESTAMPTZ`  | No       | `now()`       | Timestamp pembuatan entri pemeliharaan (UTC).                      |
+
+### 3.6 Kamus Entitas Jejak Audit (`audit_logs`)
+
+| Kolom         | Tipe Data       | Nullable | Nilai Default | Penjelasan Fungsional                                                                                      |
+| ------------- | --------------- | -------- | ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `id`          | `UUID`          | No       | `uuid()`      | Identifikator unik primer catatan audit (PK).                                                              |
+| `booking_id`  | `UUID`          | No       | -             | Foreign Key ke tabel `bookings.id`.                                                                        |
+| `actor_id`    | `UUID`          | No       | -             | Foreign Key ke tabel `users.id` (eksekutor mutasi).                                                        |
+| `action`      | `VARCHAR(50)`   | No       | -             | Tipe aksi: `CREATED`, `APPROVED`, `REJECTED`, `CANCELLED`, `FORCE_CANCELLED`, `AUTO_EXPIRED`, `COMPLETED`. |
+| `old_status`  | `BookingStatus` | Yes      | `NULL`        | Status reservasi sebelum mutasi.                                                                           |
+| `new_status`  | `BookingStatus` | No       | -             | Status reservasi setelah mutasi.                                                                           |
+| `notes`       | `TEXT`          | Yes      | `NULL`        | Catatan audit, alasan penolakan, atau justifikasi pembatalan.                                              |
+| `recorded_at` | `TIMESTAMPTZ`   | No       | `now()`       | Timestamp pencatatan audit (UTC).                                                                          |
 
 ---
 
@@ -298,7 +342,7 @@ EXCLUDE USING GIST (
 
 ### 5.1 Panduan Penanganan Error Code PostgreSQL 23P01 pada Global Prisma Exception Filter di NestJS
 
-Ketika transaksi konkuren lolos dari pemeriksaan awal di level aplikasi dan menabrak *Exclusion Constraint*, PostgreSQL menolak operasi `INSERT`/`UPDATE` dengan kode kesalahan native SQLSTATE **`23P01`** (`exclusion_violation`).
+Ketika transaksi konkuren lolos dari pemeriksaan awal di level aplikasi dan menabrak _Exclusion Constraint_, PostgreSQL menolak operasi `INSERT`/`UPDATE` dengan kode kesalahan native SQLSTATE **`23P01`** (`exclusion_violation`).
 
 Secara default, Prisma ORM membungkus kesalahan engine ini ke dalam `PrismaClientKnownRequestError` (dengan kode `P2010` jika melalui raw query, atau error meta terkait) atau `PrismaClientUnknownRequestError`. Jika tidak ditangani secara spesifik pada filter global NestJS, galat ini akan diperlakukan sebagai kegagalan sistem umum dan menghasilkan respon **`HTTP 500 Internal Server Error`** ke klien.
 
@@ -504,20 +548,24 @@ Jika terjadi race condition pada milidetik yang identik dan melewati verifikasi 
 
 ### 6.3 Catatan Arsitektural: Validasi Atomik Lintas Tabel (Booking vs MaintenanceBlock)
 
-Terdapat batasan teknis mendasar pada PostgreSQL: **Exclusion Constraint GiST hanya dapat menegakkan aturan integritas pada baris-baris di dalam satu tabel yang sama**. PostgreSQL engine tidak mendukung *cross-table exclusion constraints*.
+Terdapat batasan teknis mendasar pada PostgreSQL: **Exclusion Constraint GiST hanya dapat menegakkan aturan integritas pada baris-baris di dalam satu tabel yang sama**. PostgreSQL engine tidak mendukung _cross-table exclusion constraints_.
 
 Artinya, PostgreSQL **tidak dapat** secara native memblokir jika jadwal pemeliharaan baru pada tabel `maintenance_blocks` bertubrukan dengan reservasi aktif pada tabel `bookings`.
 
 Untuk mengatasi batasan ini, SpaceSync menetapkan strategi arsitektural ganda:
 
 #### 1. Penegakan Integritas di Application & Transaction Layer (Fase 1 - Terpilih)
+
 Pencegahan bentrok lintas tabel dijamin secara atomik menggunakan kombinasi:
+
 - **Pessimistic Row Lock:** Mengunci baris induk `Room` menggunakan query `SELECT id FROM "rooms" WHERE id = :roomId FOR UPDATE` di dalam transaksi ACID.
-- **Dual Query Verification:** Di dalam `ConflictEngineService.validateSlotAvailability`, service mengeksekusi verifikasi overlap terhadap tabel `bookings` dan tabel `maintenance_blocks` secara berurutan dalam unit kerja (*unit of work*) transaksi yang sama.
-- Karena baris `Room` dikunci secara eksklusif, proses persetujuan pemesanan umum dan pembuatan blok pemeliharaan untuk ruangan yang sama dipaksa berjalan antre (*serialized execution*), mengeliminasi celah *race condition* lintas tabel.
+- **Dual Query Verification:** Di dalam `ConflictEngineService.validateSlotAvailability`, service mengeksekusi verifikasi overlap terhadap tabel `bookings` dan tabel `maintenance_blocks` secara berurutan dalam unit kerja (_unit of work_) transaksi yang sama.
+- Karena baris `Room` dikunci secara eksklusif, proses persetujuan pemesanan umum dan pembuatan blok pemeliharaan untuk ruangan yang sama dipaksa berjalan antre (_serialized execution_), mengeliminasi celah _race condition_ lintas tabel.
 
 #### 2. Alternatif Arsitektur Tabel Tunggal (Fase Lanjutan / Opsi Unifikasi)
+
 Jika di masa depan diinginkan penegakan integritas 100% mutlak di level engine PostgreSQL tanpa mengandalkan lock aplikasi:
+
 - Entitas pemeliharaan dapat dilebur ke dalam tabel `bookings` dengan menambahkan kolom diskriminator `type`:
   ```prisma
   enum BookingType {
@@ -525,7 +573,7 @@ Jika di masa depan diinginkan penegakan integritas 100% mutlak di level engine P
     MAINTENANCE
   }
   ```
-- Dengan pendekatan *Single Table*, Exclusion Constraint PostgreSQL otomatis melindungi seluruh slot jadwal (baik kegiatan pengguna maupun pemeliharaan fasilitas) dalam satu indeks GiST tunggal:
+- Dengan pendekatan _Single Table_, Exclusion Constraint PostgreSQL otomatis melindungi seluruh slot jadwal (baik kegiatan pengguna maupun pemeliharaan fasilitas) dalam satu indeks GiST tunggal:
   ```sql
   ALTER TABLE "bookings"
   ADD CONSTRAINT "no_overlapping_all_events"
