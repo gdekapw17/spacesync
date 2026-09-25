@@ -1,0 +1,50 @@
+# ==========================================
+# Operating System & IDE Files
+# ==========================================
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Antigravity / VS Code runtime state
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# ==========================================
+# Build Artifacts & Generated Files
+# ==========================================
+# Backend (NestJS / TypeScript)
+backend/dist/
+backend/coverage/
+
+# Frontend (Next.js App Router)
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/coverage/
+
+# TypeScript compiler build cache
+*.tsbuildinfo
+backend/*.tsbuildinfo
+frontend/*.tsbuildinfo
+
+# Prisma generated client / database local artifacts (jika memakai sqlite/test db)
+*.sqlite
+*.sqlite-journal
