@@ -853,6 +853,7 @@ export class QueryRoomsDto {
       "capacity": 150,
       "location": "Gedung Rektorat Lt. 3",
       "status": "AVAILABLE",
+      "timezone": "Asia/Jakarta",
       "bufferMinutes": 15,
       "isAvailable": true,
       "manager": {
@@ -923,6 +924,7 @@ export class RoomScheduleQueryDto {
     "capacity": 150,
     "location": "Gedung Rektorat Lt. 3",
     "status": "AVAILABLE",
+    "timezone": "Asia/Jakarta",
     "bufferMinutes": 15,
     "manager": {
       "id": "e2a9b340-9a2c-4734-9271-4fb24e883832",
@@ -947,6 +949,7 @@ export class RoomScheduleQueryDto {
           "id": "d8e3b123-234a-4f55-8911-3ab45c110293",
           "title": "Sterilisasi dan Servis Proyektor",
           "startTime": "2026-10-15T13:00:00.000Z",
+          "endTime": "2026-10-15T14:00:00.000Z",
           "operationalEndTime": "2026-10-15T14:00:00.000Z",
           "reason": "Maintenance rutin berkala"
         }
@@ -994,6 +997,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsTimeZone,
   IsUUID,
   Max,
   MaxLength,
@@ -1032,6 +1036,17 @@ export class CreateRoomDto {
   @IsNotEmpty({ message: "Lokasi gedung/lantai wajib diisi" })
   @MaxLength(255, { message: "Lokasi maksimal 255 karakter" })
   location: string;
+
+  @ApiPropertyOptional({
+    example: "Asia/Jakarta",
+    default: "Asia/Jakarta",
+    description: "Zona waktu IANA operasional fisik ruangan",
+  })
+  @IsOptional()
+  @IsTimeZone({
+    message: "Format zona waktu harus berupa IANA Timezone yang valid",
+  })
+  timezone?: string = "Asia/Jakarta";
 
   @ApiPropertyOptional({
     example: 15,
@@ -1075,6 +1090,7 @@ export class CreateRoomDto {
     "capacity": 40,
     "location": "Gedung Lab Terpadu Lt. 2, Sayap Barat",
     "status": "AVAILABLE",
+    "timezone": "Asia/Jakarta",
     "bufferMinutes": 15,
     "managerId": "e2a9b340-9a2c-4734-9271-4fb24e883832",
     "createdAt": "2026-09-25T02:51:00.000Z",
@@ -1140,6 +1156,7 @@ export class UpdateRoomDto extends PartialType(CreateRoomDto) {
     "capacity": 45,
     "location": "Gedung Lab Terpadu Lt. 2, Sayap Barat",
     "status": "MAINTENANCE",
+    "timezone": "Asia/Jakarta",
     "bufferMinutes": 20,
     "managerId": "e2a9b340-9a2c-4734-9271-4fb24e883832",
     "updatedAt": "2026-09-25T02:52:00.000Z"
@@ -1233,8 +1250,14 @@ Menggunakan `RoomParamDto` (`id: string` UUID v4).
 #### Request Body DTO
 
 ```typescript
-import { ApiProperty } from "@nestjs/swagger";
-import { IsISO8601, IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsISO8601,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from "class-validator";
 
 export class CreateMaintenanceBlockDto {
   @ApiProperty({
@@ -1272,10 +1295,22 @@ export class CreateMaintenanceBlockDto {
   })
   @IsISO8601(
     { strict: true },
+    { message: "endTime harus berformat ISO-8601 UTC yang valid" },
+  )
+  @IsNotEmpty({ message: "endTime wajib diisi" })
+  endTime: string;
+
+  @ApiPropertyOptional({
+    example: "2026-10-15T12:00:00.000Z",
+    description:
+      "Waktu selesai operasional (sterilisasi buffer) pemeliharaan (ISO-8601 UTC, default sama dengan endTime)",
+  })
+  @IsOptional()
+  @IsISO8601(
+    { strict: true },
     { message: "operationalEndTime harus berformat ISO-8601 UTC yang valid" },
   )
-  @IsNotEmpty({ message: "operationalEndTime wajib diisi" })
-  operationalEndTime: string;
+  operationalEndTime?: string;
 }
 ```
 
@@ -1294,6 +1329,7 @@ export class CreateMaintenanceBlockDto {
     "title": "Servis AC dan Penggantian Filter",
     "reason": "Pemeliharaan berkala unit pendingin udara ruangan",
     "startTime": "2026-10-15T08:00:00.000Z",
+    "endTime": "2026-10-15T12:00:00.000Z",
     "operationalEndTime": "2026-10-15T12:00:00.000Z",
     "createdAt": "2026-09-25T03:00:00.000Z"
   }
@@ -1381,6 +1417,7 @@ export class QueryMaintenanceDto {
       "title": "Servis AC dan Penggantian Filter",
       "reason": "Pemeliharaan berkala unit pendingin udara ruangan",
       "startTime": "2026-10-15T08:00:00.000Z",
+      "endTime": "2026-10-15T12:00:00.000Z",
       "operationalEndTime": "2026-10-15T12:00:00.000Z",
       "createdAt": "2026-09-25T03:00:00.000Z"
     }
@@ -1509,6 +1546,22 @@ import {
   ValidatorConstraintInterface,
 } from "class-validator";
 
+@ValidatorConstraint({ name: "IsValidLeadTime", async: false })
+export class IsValidLeadTimeConstraint implements ValidatorConstraintInterface {
+  validate(startTimeValue: string): boolean {
+    if (!startTimeValue) return false;
+    const start = new Date(startTimeValue).getTime();
+    const now = Date.now();
+    const minLeadTime = now + 24 * 60 * 60 * 1000; // H+1 (24 Jam)
+    const maxLeadTime = now + 30 * 24 * 60 * 60 * 1000; // H+30 Hari
+    return start >= minLeadTime && start <= maxLeadTime;
+  }
+
+  defaultMessage(): string {
+    return "Pemesanan harus diajukan minimal 24 jam dan maksimal 30 hari sebelum acara";
+  }
+}
+
 @ValidatorConstraint({ name: "IsAfterStartTime", async: false })
 export class IsAfterStartTimeConstraint implements ValidatorConstraintInterface {
   validate(endTimeValue: string, args: ValidationArguments): boolean {
@@ -1581,6 +1634,7 @@ export class CreateBookingDto {
     },
   )
   @IsNotEmpty({ message: "startTime wajib diisi" })
+  @Validate(IsValidLeadTimeConstraint)
   startTime: string;
 
   @ApiProperty({
@@ -2318,6 +2372,8 @@ export enum AuditAction {
   REJECTED = "REJECTED",
   CANCELLED = "CANCELLED",
   FORCE_CANCELLED = "FORCE_CANCELLED",
+  AUTO_EXPIRED = "AUTO_EXPIRED",
+  COMPLETED = "COMPLETED",
 }
 
 export class QueryAuditLogsDto {
@@ -2433,13 +2489,19 @@ export class QueryAuditLogsDto {
 
 ### 5.2 Health & Readiness Probe Sistem
 
-Endpoint observabilitas berbasis `@nestjs/terminus` untuk kebutuhan *orchestration probe* (Docker, Kubernetes, Cloud Run) dan pemantauan performa koneksi basis data PostgreSQL serta utilisasi memori secara non-blocking.
+Endpoint observabilitas berbasis `@nestjs/terminus` untuk kebutuhan *orchestration probe* (Docker, Kubernetes, Cloud Run) dan pemantauan performa koneksi basis data PostgreSQL serta utilisasi memori secara non-blocking. Seluruh endpoint probe ini dikonfigurasi dengan decorator `@Public()` sehingga dapat diakses tanpa autentikasi JWT token oleh sistem pemantau eksternal.
+
+---
+
+#### 5.2.1 Full Health Check (Agregat Sistem)
+
+Memeriksa kesehatan seluruh komponen sistem (konektivitas basis data PostgreSQL via Prisma dan ambang batas alokasi memori heap) dalam satu agregat respons tunggal.
 
 - **Endpoint:** `GET /api/v1/health`
 - **Akses Guard:** `@Public()` (Tanpa Guard)
 - **Headers:** None
 
-#### Response Payloads
+##### Response Payloads
 
 **Success (`HTTP 200 OK`)**
 
@@ -2451,19 +2513,19 @@ Endpoint observabilitas berbasis `@nestjs/terminus` untuk kebutuhan *orchestrati
   "data": {
     "status": "ok",
     "info": {
-      "database": {
+      "memory_heap": {
         "status": "up"
       },
-      "memory_heap": {
+      "database": {
         "status": "up"
       }
     },
     "error": {},
     "details": {
-      "database": {
+      "memory_heap": {
         "status": "up"
       },
-      "memory_heap": {
+      "database": {
         "status": "up"
       }
     }
@@ -2471,7 +2533,7 @@ Endpoint observabilitas berbasis `@nestjs/terminus` untuk kebutuhan *orchestrati
 }
 ```
 
-**Failure (`HTTP 503 Service Unavailable` — Koneksi Database Terputus)**
+**Failure (`HTTP 503 Service Unavailable` — Dependensi Gagal)**
 
 ```json
 {
@@ -2504,6 +2566,136 @@ Endpoint observabilitas berbasis `@nestjs/terminus` untuk kebutuhan *orchestrati
   },
   "timestamp": "2026-09-25T03:30:00.000Z",
   "path": "/api/v1/health"
+}
+```
+
+---
+
+#### 5.2.2 Liveness Probe (Event Loop & Alokasi Memori Heap)
+
+Digunakan oleh orchestrator (misal: Kubernetes `livenessProbe`) untuk memastikan event loop aplikasi tetap hidup dan penggunaan heap memori berada di bawah batas 300 MB. Jika probe ini gagal, orchestrator akan me-restart pod kontainer.
+
+- **Endpoint:** `GET /api/v1/health/liveness`
+- **Akses Guard:** `@Public()` (Tanpa Guard)
+- **Headers:** None
+
+##### Response Payloads
+
+**Success (`HTTP 200 OK`)**
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Liveness probe sehat: Event loop dan alokasi memori beroperasi normal",
+  "data": {
+    "status": "ok",
+    "info": {
+      "memory_heap": {
+        "status": "up"
+      }
+    },
+    "error": {},
+    "details": {
+      "memory_heap": {
+        "status": "up"
+      }
+    }
+  }
+}
+```
+
+**Failure (`HTTP 503 Service Unavailable` — Alokasi Memori Melampaui Batas)**
+
+```json
+{
+  "success": false,
+  "statusCode": 503,
+  "error": "ServiceUnavailableException",
+  "message": "Liveness probe gagal: Alokasi heap memori melampaui batas aman",
+  "data": {
+    "status": "error",
+    "info": {},
+    "error": {
+      "memory_heap": {
+        "status": "down",
+        "message": "Used heap size exceeds the threshold of 300MB"
+      }
+    },
+    "details": {
+      "memory_heap": {
+        "status": "down",
+        "message": "Used heap size exceeds the threshold of 300MB"
+      }
+    }
+  },
+  "timestamp": "2026-09-25T03:30:00.000Z",
+  "path": "/api/v1/health/liveness"
+}
+```
+
+---
+
+#### 5.2.3 Readiness Probe (Koneksi Pool Basis Data PostgreSQL)
+
+Digunakan oleh orchestrator (misal: Kubernetes `readinessProbe` / Ingress) untuk memastikan Prisma Client berhasil terhubung dan siap menerima query ke database PostgreSQL sebelum mengalirkan trafik pengguna. Jika probe ini gagal, kontainer ditandai tidak siap menerima trafik tanpa di-restart paksa.
+
+- **Endpoint:** `GET /api/v1/health/readiness`
+- **Akses Guard:** `@Public()` (Tanpa Guard)
+- **Headers:** None
+
+##### Response Payloads
+
+**Success (`HTTP 200 OK`)**
+
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Readiness probe sehat: Koneksi database PostgreSQL siap menerima query",
+  "data": {
+    "status": "ok",
+    "info": {
+      "database": {
+        "status": "up"
+      }
+    },
+    "error": {},
+    "details": {
+      "database": {
+        "status": "up"
+      }
+    }
+  }
+}
+```
+
+**Failure (`HTTP 503 Service Unavailable` — Koneksi PostgreSQL Gagal)**
+
+```json
+{
+  "success": false,
+  "statusCode": 503,
+  "error": "ServiceUnavailableException",
+  "message": "Readiness probe gagal: Sambungan ke database PostgreSQL terputus",
+  "data": {
+    "status": "error",
+    "info": {},
+    "error": {
+      "database": {
+        "status": "down",
+        "message": "PrismaClientInitializationError: Can't reach database server at localhost:5432"
+      }
+    },
+    "details": {
+      "database": {
+        "status": "down",
+        "message": "PrismaClientInitializationError: Can't reach database server at localhost:5432"
+      }
+    }
+  },
+  "timestamp": "2026-09-25T03:30:00.000Z",
+  "path": "/api/v1/health/readiness"
 }
 ```
 
