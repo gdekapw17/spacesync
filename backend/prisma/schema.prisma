@@ -1,0 +1,163 @@
+// ==========================================
+// PRISMA CLIENT & DATASOURCE DEFINITION
+// ==========================================
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum Role {
+  SUPER_ADMIN
+  ROOM_MANAGER
+  USER
+}
+
+enum RoomStatus {
+  AVAILABLE
+  MAINTENANCE
+  INACTIVE
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+// ==========================================
+// DATA MODELS
+// ==========================================
+
+model User {
+  id                 String     @id @default(uuid()) @db.Uuid
+  email              String     @unique @db.VarChar(255)
+  passwordHash       String     @map("password_hash") @db.VarChar(255)
+  hashedRefreshToken String?    @map("hashed_refresh_token") @db.VarChar(255)
+  role               Role       @default(USER)
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Bidirectional Relations
+  profile            Profile?
+  managedRooms       Room[]     @relation("RoomManagerRelation")
+  bookings           Booking[]
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @map("user_id") @db.Uuid
+  fullName    String   @map("full_name") @db.VarChar(150)
+  phoneNumber String?  @map("phone_number") @db.VarChar(30)
+  department  String?  @db.VarChar(100)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Cascade delete ensures profile cleanup when the associated user is removed
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Room {
+  id            String             @id @default(uuid()) @db.Uuid
+  name          String             @db.VarChar(100)
+  code          String             @unique @db.VarChar(30)
+  capacity      Int                @db.Integer
+  location      String             @db.VarChar(255)
+  status        RoomStatus         @default(AVAILABLE)
+  timezone      String             @default("Asia/Jakarta") @db.VarChar(50)
+  bufferMinutes Int                @default(15) @map("buffer_minutes") @db.Integer
+  managerId     String?            @map("manager_id") @db.Uuid
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Preserves physical room records even if the designated manager account is unassigned or deleted
+  manager       User?              @relation("RoomManagerRelation", fields: [managerId], references: [id], onDelete: SetNull)
+  bookings      Booking[]
+  maintenances  MaintenanceBlock[]
+
+  // Indexes to accelerate catalog browsing and manager dashboard queries
+  @@index([status, capacity], name: "idx_rooms_catalog_filter")
+  @@index([managerId], name: "idx_rooms_manager_id")
+  @@map("rooms")
+}
+
+model Booking {
+  id                 String        @id @default(uuid()) @db.Uuid
+  roomId             String        @map("room_id") @db.Uuid
+  userId             String        @map("user_id") @db.Uuid
+  title              String        @db.VarChar(150)
+  description        String?       @db.Text
+  startTime          DateTime      @map("start_time") @db.Timestamptz(6)
+  endTime            DateTime      @map("end_time") @db.Timestamptz(6)
+  operationalEndTime DateTime      @map("operational_end_time") @db.Timestamptz(6)
+  bufferMinutes      Int           @default(15) @map("buffer_minutes") @db.Integer
+  status             BookingStatus @default(PENDING)
+  rejectionReason    String?       @map("rejection_reason") @db.Text
+  cancellationReason String?       @map("cancellation_reason") @db.Text
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Restrict rules prevent accidental physical deletion of rooms or users having active/historical bookings
+  room               Room          @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  user               User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  auditLogs          AuditLog[]
+
+  // Indexes optimizing timeline conflict detection, user dashboard lists, and cron status sweeps
+  @@index([roomId, startTime, operationalEndTime], name: "idx_bookings_room_timeline")
+  @@index([userId, status], name: "idx_bookings_user_status")
+  @@index([status, startTime], name: "idx_bookings_cron_status")
+  @@map("bookings")
+}
+
+model MaintenanceBlock {
+  id                 String   @id @default(uuid()) @db.Uuid
+  roomId             String   @map("room_id") @db.Uuid
+  title              String   @db.VarChar(150)
+  reason             String   @db.Text
+  startTime          DateTime @map("start_time") @db.Timestamptz(6)
+  endTime            DateTime @map("end_time") @db.Timestamptz(6)
+  operationalEndTime DateTime @map("operational_end_time") @db.Timestamptz(6)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Cascade allows scheduled maintenance records to be purged if the parent room is deleted
+  room               Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // Index for operational timeline queries and conflict validation
+  @@index([roomId, startTime, operationalEndTime], name: "idx_maintenance_room_timeline")
+  @@map("maintenance_blocks")
+}
+
+model AuditLog {
+  id         String         @id @default(uuid()) @db.Uuid
+  bookingId  String         @map("booking_id") @db.Uuid
+  actorId    String         @map("actor_id") @db.Uuid
+  action     String         @db.VarChar(50)
+  oldStatus  BookingStatus? @map("old_status")
+  newStatus  BookingStatus  @map("new_status")
+  notes      String?        @db.Text
+  recordedAt DateTime       @default(now()) @map("recorded_at") @db.Timestamptz(6)
+
+  // Audit history is purged if a booking is removed, but actor identity is strictly preserved
+  booking    Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  actor      User           @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  // Index to retrieve chronologically ordered mutation logs for any booking
+  @@index([bookingId, recordedAt], name: "idx_audit_logs_booking_history")
+  @@map("audit_logs")
+}
