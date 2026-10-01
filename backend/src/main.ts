@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformResponseInterceptor } from './common/interceptors/transform.interceptor';
@@ -22,10 +23,13 @@ async function bootstrap(): Promise<void> {
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
 
-  // 1. Enable Graceful Shutdown hooks for database connection draining
+  // Enable Graceful Shutdown hooks for database connection draining
   app.enableShutdownHooks();
 
-  // 2. Configure standardized CORS policy
+  // Register cookie-parser to parse incoming HTTP cookies into req.cookies
+  app.use(cookieParser());
+
+  // Configure standardized CORS policy
   app.enableCors({
     origin: (
       origin: string | undefined,
@@ -51,20 +55,20 @@ async function bootstrap(): Promise<void> {
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   });
 
-  // 3. Set global API route prefix
+  // Set global API route prefix
   const globalPrefix = 'api/v1';
   app.setGlobalPrefix(globalPrefix);
 
-  // 4. Register global execution pipeline (Pipes, Interceptors, Filters)
+  // Register global execution pipeline (Pipes, Interceptors, Filters)
   app.useGlobalPipes(new StrictValidationPipe());
   app.useGlobalInterceptors(new TransformResponseInterceptor(reflector));
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // 5. Configure Swagger / OpenAPI documentation
+  // Configure Swagger / OpenAPI documentation
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SpaceSync API')
     .setDescription(
-      'RESTful API Contract & Interface Specification for SpaceSync — Shared Room & Facility Reservation Management System.',
+      'Dokumentasi & Spesifikasi Antarmuka RESTful API SpaceSync — Sistem Manajemen Reservasi Ruangan & Fasilitas Bersama.',
     )
     .setVersion('1.0.0')
     .addBearerAuth(
@@ -73,12 +77,12 @@ async function bootstrap(): Promise<void> {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
-        description: 'Enter your Bearer Access Token in the format: Bearer <token>',
+        description: 'Masukkan Access Token Bearer dengan format: Bearer <token>',
         in: 'header',
       },
       'JWT-auth',
     )
-    .addTag('Health & Monitoring', 'Liveness and readiness probes for infrastructure monitoring')
+    .addTag('Health & Monitoring', 'Probe pemantauan kesehatan dan kesiapan infrastruktur')
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
@@ -90,10 +94,10 @@ async function bootstrap(): Promise<void> {
       persistAuthorization: true,
       displayRequestDuration: true,
     },
-    customSiteTitle: 'SpaceSync API Documentation',
+    customSiteTitle: 'Dokumentasi API SpaceSync',
   });
 
-  // 6. Start HTTP Server listener
+  // Start HTTP Server listener
   const port = configService.get<number>('PORT', 4000);
   await app.listen(port);
 
