@@ -28,9 +28,7 @@ export class TransformResponseInterceptor<T> implements NestInterceptor<T, ApiRe
         // Default fallback message based on standard HTTP status codes
         let message =
           customMessage ??
-          (statusCode === 201
-            ? 'Resource created successfully'
-            : 'Operation completed successfully');
+          (statusCode === 201 ? 'Data berhasil dibuat' : 'Operasi berhasil diselesaikan');
 
         let data: unknown = result;
         let meta: PaginationMeta | undefined = undefined;
