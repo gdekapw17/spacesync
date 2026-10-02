@@ -7,7 +7,15 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BookingStatus, Prisma, Role, RoomStatus } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
-import { CreateBookingDto, QueryBookingsDto, QueryTimelineDto } from '../dto';
+import {
+  CancelBookingDto,
+  CreateBookingDto,
+  ForceCancelBookingDto,
+  QueryBookingsDto,
+  QueryTimelineDto,
+  UpdateBookingStatusDto,
+  ApprovalAction,
+} from '../dto';
 import { ConflictEngineService } from './conflict-engine.service';
 
 /**
@@ -34,7 +42,7 @@ export interface PaginatedResult<T> {
 
 /**
  * Main application service orchestrating booking lifecycle, access control,
- * database transactions, and calendar timeline data aggregation.
+ * database transactions, approval workflows, and cancellations.
  */
 @Injectable()
 export class BookingsService {
@@ -478,5 +486,327 @@ export class BookingsService {
       createdAt: booking.createdAt.toISOString(),
       updatedAt: booking.updatedAt.toISOString(),
     };
+  }
+
+  /**
+   * Processes manager approval or rejection decisions inside a Serializable transaction.
+   * Re-evaluates schedule overlap strictly when approving to prevent race conditions.
+   *
+   * @param id - Unique booking identifier UUID v4
+   * @param user - Authenticated user identity (Room Manager or Super Admin)
+   * @param dto - UpdateBookingStatusDto payload
+   */
+  async updateStatus(
+    id: string,
+    user: AuthenticatedUserPayload,
+    dto: UpdateBookingStatusDto,
+  ): Promise<unknown> {
+    return await this.prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // 1. Fetch booking with room relation
+        const booking = await tx.booking.findUnique({
+          where: { id },
+          include: {
+            room: {
+              select: {
+                id: true,
+                managerId: true,
+              },
+            },
+          },
+        });
+
+        if (!booking) {
+          throw new NotFoundException('Reservasi tidak ditemukan');
+        }
+
+        // 2. Validate jurisdictional authority for Room Manager
+        if (user.role === Role.ROOM_MANAGER && booking.room.managerId !== user.id) {
+          throw new ForbiddenException(
+            'Akses ditolak: Anda tidak memiliki wewenang manajerial atas ruangan pada reservasi ini',
+          );
+        }
+
+        // 3. Ensure booking is strictly in PENDING state
+        if (booking.status !== BookingStatus.PENDING) {
+          throw new BadRequestException(
+            'Hanya reservasi berstatus PENDING yang dapat diproses keputusannya',
+          );
+        }
+
+        let newStatus: BookingStatus;
+        let rejectionReason: string | null = null;
+        let auditAction: string;
+        let auditNotes: string;
+
+        if (dto.status === ApprovalAction.APPROVED) {
+          // Lock room row to serialize approval race conditions
+          await this.conflictEngine.lockRoomRow(tx, booking.roomId);
+
+          // Re-verify overlap inside isolation transaction excluding current pending booking
+          await this.conflictEngine.assertNoOverlap(tx, {
+            roomId: booking.roomId,
+            startTime: booking.startTime,
+            operationalEndTime: booking.operationalEndTime,
+            excludeBookingId: booking.id,
+          });
+
+          newStatus = BookingStatus.APPROVED;
+          auditAction = 'BOOKING_APPROVED';
+          auditNotes = 'Permohonan reservasi disetujui oleh pengelola ruangan';
+        } else {
+          newStatus = BookingStatus.REJECTED;
+          rejectionReason = dto.rejectionReason ?? null;
+          auditAction = 'BOOKING_REJECTED';
+          auditNotes = dto.rejectionReason ?? 'Permohonan reservasi ditolak';
+        }
+
+        // 4. Update booking entity
+        const updatedBooking = await tx.booking.update({
+          where: { id },
+          data: {
+            status: newStatus,
+            rejectionReason,
+          },
+        });
+
+        // 5. Record state transition in audit trail
+        await tx.auditLog.create({
+          data: {
+            bookingId: updatedBooking.id,
+            actorId: user.id,
+            action: auditAction,
+            oldStatus: BookingStatus.PENDING,
+            newStatus,
+            notes: auditNotes,
+          },
+        });
+
+        // 6. Emit status changed domain event (hooked to step 3.6 listeners)
+        this.eventEmitter.emit('booking.status_changed', {
+          bookingId: updatedBooking.id,
+          actorId: user.id,
+          oldStatus: BookingStatus.PENDING,
+          newStatus,
+          rejectionReason,
+        });
+
+        return {
+          id: updatedBooking.id,
+          status: updatedBooking.status,
+          rejectionReason: updatedBooking.rejectionReason,
+          updatedAt: updatedBooking.updatedAt.toISOString(),
+        };
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        maxWait: 5000,
+        timeout: 10000,
+      },
+    );
+  }
+
+  /**
+   * Executes self-cancellation by the applicant enforcing the strict H-2 hours deadline.
+   *
+   * @param id - Unique booking identifier UUID v4
+   * @param user - Authenticated user identity (Applicant or Super Admin)
+   * @param dto - CancelBookingDto payload
+   */
+  async cancelBooking(
+    id: string,
+    user: AuthenticatedUserPayload,
+    dto: CancelBookingDto,
+  ): Promise<unknown> {
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const booking = await tx.booking.findUnique({
+        where: { id },
+      });
+
+      if (!booking) {
+        throw new NotFoundException('Reservasi tidak ditemukan');
+      }
+
+      // 1. Verify ownership (applicant or Super Admin)
+      const isOwner = booking.userId === user.id;
+      const isSuperAdmin = user.role === Role.SUPER_ADMIN;
+
+      if (!isOwner && !isSuperAdmin) {
+        throw new ForbiddenException(
+          'Akses ditolak: Anda tidak memiliki wewenang untuk membatalkan reservasi ini',
+        );
+      }
+
+      // 2. Validate cancellable state
+      if (booking.status !== BookingStatus.PENDING && booking.status !== BookingStatus.APPROVED) {
+        throw new BadRequestException(
+          'Reservasi tidak dapat dibatalkan karena sudah berstatus REJECTED, CANCELLED, atau COMPLETED',
+        );
+      }
+
+      // 3. Enforce strict H-2 hours cancellation deadline
+      const currentTimestamp = Date.now();
+      const startTimestamp = booking.startTime.getTime();
+      const twoHoursInMs = 2 * 60 * 60 * 1000;
+
+      if (currentTimestamp >= startTimestamp) {
+        throw new BadRequestException('Acara telah berlangsung atau waktu mulai telah terlewati');
+      }
+
+      if (currentTimestamp > startTimestamp - twoHoursInMs) {
+        throw new BadRequestException(
+          'Batas waktu pembatalan mandiri telah terlewati (maksimal 2 jam sebelum waktu mulai acara). Silakan hubungi Unit Manager terkait.',
+        );
+      }
+
+      const cancellationReason = dto.cancellationReason ?? 'Dibatalkan secara mandiri oleh pemohon';
+
+      // 4. Update status to CANCELLED
+      const updatedBooking = await tx.booking.update({
+        where: { id },
+        data: {
+          status: BookingStatus.CANCELLED,
+          cancellationReason,
+        },
+      });
+
+      // 5. Record audit trail log
+      await tx.auditLog.create({
+        data: {
+          bookingId: updatedBooking.id,
+          actorId: user.id,
+          action: 'BOOKING_CANCELLED',
+          oldStatus: booking.status,
+          newStatus: BookingStatus.CANCELLED,
+          notes: cancellationReason,
+        },
+      });
+
+      // 6. Emit status changed domain event
+      this.eventEmitter.emit('booking.status_changed', {
+        bookingId: updatedBooking.id,
+        actorId: user.id,
+        oldStatus: booking.status,
+        newStatus: BookingStatus.CANCELLED,
+        cancellationReason,
+      });
+
+      return {
+        id: updatedBooking.id,
+        status: updatedBooking.status,
+        cancellationReason: updatedBooking.cancellationReason,
+        updatedAt: updatedBooking.updatedAt.toISOString(),
+      };
+    });
+  }
+
+  /**
+   * Executes emergency force-cancellation by Room Manager or Super Admin,
+   * bypassing the H-2 hours deadline while requiring a formal justification reason.
+   *
+   * @param id - Unique booking identifier UUID v4
+   * @param user - Authenticated user identity (Room Manager or Super Admin)
+   * @param dto - ForceCancelBookingDto payload
+   */
+  async forceCancelBooking(
+    id: string,
+    user: AuthenticatedUserPayload,
+    dto: ForceCancelBookingDto,
+  ): Promise<unknown> {
+    return await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const booking = await tx.booking.findUnique({
+        where: { id },
+        include: {
+          room: {
+            select: {
+              id: true,
+              managerId: true,
+            },
+          },
+        },
+      });
+
+      if (!booking) {
+        throw new NotFoundException('Reservasi tidak ditemukan');
+      }
+
+      // 1. Verify managerial jurisdiction
+      if (user.role === Role.ROOM_MANAGER && booking.room.managerId !== user.id) {
+        throw new ForbiddenException(
+          'Akses ditolak: Anda tidak memiliki wewenang manajerial atas ruangan pada reservasi ini',
+        );
+      }
+
+      // 2. Validate cancellable state
+      if (
+        booking.status === BookingStatus.CANCELLED ||
+        booking.status === BookingStatus.COMPLETED
+      ) {
+        throw new BadRequestException(
+          'Reservasi tidak dapat dibatalkan darurat karena sudah berstatus CANCELLED atau COMPLETED',
+        );
+      }
+
+      if (booking.status === BookingStatus.REJECTED) {
+        throw new BadRequestException('Reservasi sudah ditolak sebelumnya');
+      }
+
+      // 3. Update status to CANCELLED with emergency reason
+      const updatedBooking = await tx.booking.update({
+        where: { id },
+        data: {
+          status: BookingStatus.CANCELLED,
+          cancellationReason: dto.reason,
+        },
+      });
+
+      // 4. Record force-cancellation audit log
+      await tx.auditLog.create({
+        data: {
+          bookingId: updatedBooking.id,
+          actorId: user.id,
+          action: 'BOOKING_FORCE_CANCELLED',
+          oldStatus: booking.status,
+          newStatus: BookingStatus.CANCELLED,
+          notes: dto.reason,
+        },
+      });
+
+      // 5. Fetch executor profile for response envelope
+      const actor = await tx.user.findUnique({
+        where: { id: user.id },
+        select: {
+          id: true,
+          role: true,
+          profile: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      });
+
+      // 6. Emit status changed domain event
+      this.eventEmitter.emit('booking.status_changed', {
+        bookingId: updatedBooking.id,
+        actorId: user.id,
+        oldStatus: booking.status,
+        newStatus: BookingStatus.CANCELLED,
+        cancellationReason: dto.reason,
+        isForceCancelled: true,
+      });
+
+      return {
+        id: updatedBooking.id,
+        status: updatedBooking.status,
+        cancellationReason: updatedBooking.cancellationReason,
+        cancelledBy: {
+          id: actor?.id ?? user.id,
+          fullName: actor?.profile?.fullName ?? 'Administrator',
+          role: actor?.role ?? user.role,
+        },
+        updatedAt: updatedBooking.updatedAt.toISOString(),
+      };
+    });
   }
 }
