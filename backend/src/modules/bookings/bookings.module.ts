@@ -6,7 +6,7 @@ import { ConflictEngineService } from './services/conflict-engine.service';
 
 /**
  * Encapsulated feature module orchestrating room reservations,
- * mathematical zero-overlap conflict detection, and calendar queries.
+ * mathematical zero-overlap conflict detection, approval workflows, and cancellations.
  */
 @Module({
   imports: [PrismaModule],

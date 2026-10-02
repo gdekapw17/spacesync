@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 /**
  * Root Application Module for SpaceSync.
@@ -19,20 +20,28 @@ import { MaintenanceModule } from './modules/maintenance/maintenance.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    // Global event emitter subsystem
-    EventEmitterModule.forRoot(),
+
+    // In-memory decoupled domain event pipeline
+    EventEmitterModule.forRoot({
+      wildcard: false,
+      delimiter: '.',
+      newListener: false,
+      removeListener: false,
+      maxListeners: 20,
+      verboseMemoryLeak: true,
+      ignoreErrors: false,
+    }),
+
     // Global database persistence layer
     PrismaModule,
-    // Health and observability probes
-    HealthModule,
-    // Authentication & Authorization Modules
+
+    // Core feature modules
     AuthModule,
-    // User Management Modules
     UsersModule,
-    // Room & Schedule Modules
     RoomsModule,
-    // Maintenance Module
     MaintenanceModule,
+    BookingsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
