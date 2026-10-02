@@ -12,9 +12,7 @@ import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../../database/prisma.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { RegisterDto, LoginDto, ChangePasswordDto } from './dto';
 import { JwtPayload, JwtRefreshPayload } from './interfaces/jwt-payload.interface';
 import { setRefreshTokenCookie, clearRefreshTokenCookie } from './constants/auth.constants';
 

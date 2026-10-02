@@ -13,9 +13,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { UsersService } from './users.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { QueryUsersDto } from './dto/query-users.dto';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdateProfileDto, QueryUsersDto, UpdateUserRoleDto } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';

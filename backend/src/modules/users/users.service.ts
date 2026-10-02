@@ -1,9 +1,7 @@
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../../database/prisma.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { QueryUsersDto } from './dto/query-users.dto';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdateProfileDto, QueryUsersDto, UpdateUserRoleDto } from './dto';
 
 /**
  * Service responsible for managing user profiles, paginated administrator queries,
