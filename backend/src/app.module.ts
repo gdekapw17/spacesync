@@ -5,6 +5,7 @@ import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 
 /**
  * Root Application Module for SpaceSync.
@@ -21,11 +22,14 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     PrismaModule,
     // Health and observability probes
     HealthModule,
-    // Authentication, Authorization & User Management Modules
+    // Authentication & Authorization Modules
     AuthModule,
+    // User Management Modules
     UsersModule,
     // Room & Schedule Modules
     RoomsModule,
+    // Maintenance Module
+    MaintenanceModule,
   ],
 })
 export class AppModule {}
